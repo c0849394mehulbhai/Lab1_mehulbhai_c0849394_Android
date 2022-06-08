@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -69,6 +70,21 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 }
                 latLngList.clear();
                 markerList.clear();
+            }
+        });
+
+        gMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(@NonNull LatLng latLng) {
+                for(Marker marker : markerList) {
+                    if(Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
+                        latLngList.remove(marker.getPosition());
+                        latLngList.remove(marker);
+
+                        marker.remove();
+                        break;
+                    }
+                }
             }
         });
     }
