@@ -5,15 +5,20 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.lab1mahul.databinding.ActivityMaps2Binding;
@@ -22,11 +27,13 @@ import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallback {
-    int Red=0, Green=0, Blue=0;
+public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener{
 
-    Button btnDraw,btnClear;
+    SeekBar polygonSeekbar, polylineSeekbar;
+
+    Button btnDraw, btnClear;
     private GoogleMap gMap;
     private ActivityMaps2Binding binding;
 
@@ -41,6 +48,9 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
 
         btnDraw = findViewById(R.id.btnDraw);
         btnClear = findViewById(R.id.btnClear);
+
+        polylineSeekbar = findViewById(R.id.seekBarPolyLine);
+        polygonSeekbar = findViewById(R.id.seekBarPolygon);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -64,8 +74,8 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(polygon != null) polygon.remove();
-                for(Marker m : markerList) {
+                if (polygon != null) polygon.remove();
+                for (Marker m : markerList) {
                     m.remove();
                 }
                 latLngList.clear();
@@ -73,20 +83,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
             }
         });
 
-        gMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(@NonNull LatLng latLng) {
-                for(Marker marker : markerList) {
-                    if(Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
-                        latLngList.remove(marker.getPosition());
-                        latLngList.remove(marker);
 
-                        marker.remove();
-                        break;
-                    }
-                }
-            }
-        });
     }
 
     @Override
@@ -101,7 +98,82 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 markerList.add(marker);
             }
         });
+
+        gMap.getUiSettings().setZoomControlsEnabled(true);
+        if (markerList.size() == 0) {
+            LatLngBounds boundsNorthAmerica = new LatLngBounds(new LatLng(43.273909, -127.120020), new LatLng(43.273909, -68.409081));
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(boundsNorthAmerica, 10);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    gMap.moveCamera(cameraUpdate);
+                }
+            }, 100);
+        }
+
+        gMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+
+                if (polygon != null) polygon.remove();
+                for (Marker marker : markerList) marker.remove();
+                markerList.clear();
+                latLngList.clear();
+
+            }
+        });
+
+        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Boolean isFound = false;
+                for (Marker mPoint : markerList) {
+                    if (Math.abs(mPoint.getPosition().latitude - marker.getPosition().latitude) < 0.05 && Math.abs(marker.getPosition().longitude - marker.getPosition().longitude) < 0.05) {
+                        isFound = true;
+                    }
+                }
+                if (isFound == false) {
+                    marker.remove();
+                }
+                return false;
+            }
+        });
     }
 
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        final int min = 0;
+        final int max = 255;
+        final int random = new Random().nextInt((max - min) + 1) + min;
+        final int random1 = new Random().nextInt((max - min) + 1) + min;
 
+        float[] hsvColor = {random, random, 0};
+        hsvColor[2] = 360f * i / i;
+
+        float[] hsvColor1 = {random1, 0, random1};
+        hsvColor1[1] = 360f * i / i;
+
+        switch (seekBar.getId()){
+            case R.id.seekBarPolyLine:
+                if(polygon != null) {
+                    polygon.setStrokeColor(Color.HSVToColor(hsvColor1));
+                }
+                break;
+            case R.id.seekBarPolygon:
+                if (polygon != null) {
+                    polygon.setFillColor(Color.HSVToColor(hsvColor1));
+                }
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
 }

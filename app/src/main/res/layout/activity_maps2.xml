@@ -6,31 +6,60 @@
     android:layout_height="match_parent"
     tools:context=".MapsActivity2">
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapsActivity2" />
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        tools:context=".MapsActivity2" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/map"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
-        <Button
+        <SeekBar
+            android:id="@+id/seekBarPolygon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Draw Polygon"
-            android:id="@+id/btnDraw" />
+            android:layout_marginTop="5dp"
+            android:max="255"
+            android:progressTint="#ff0000"
+            android:thumbTint="#ff0000" />
 
-        <Button
+        <SeekBar
+            android:id="@+id/seekBarPolyLine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear pin point"
-            android:id="@+id/btnClear" />
-    </LinearLayout>
+            android:layout_below="@id/seekBarPolygon"
+            android:layout_marginTop="5dp"
+            android:max="255"
+            android:progressTint="#00ff00"
+            android:thumbTint="#00ff00" />
 
+
+        <Button
+            android:id="@+id/btnDraw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="Draw  Fill Polygon" />
+
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="4dp"
+            android:text="Clear pin point" />
+    </RelativeLayout>
 </RelativeLayout>
